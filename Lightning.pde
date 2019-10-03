@@ -55,13 +55,15 @@ class Light {
     history.add(new Double[] {x, y});
     noStroke();
     fill(r, g, b);
-    // ellipse((float) center_x, (float) center_y, 15, 15);
-    // ellipse((float) target_x, (float) target_y, 15, 15);
     ellipse((float) x, (float) y, 15, 15);
     for (int i = 0; i < history.size() - 1; i ++) {
       stroke(r, g, b, 255 * i / history.size());
       strokeWeight(5 * i / history.size());   
-      line((float)(double) history.get(i)[0], (float)(double) history.get(i)[1], (float)(double) history.get(i + 1)[0], (float)(double) history.get(i + 1)[1]); 
+      line(doubletofloat(history.get(i)[0]), doubletofloat(history.get(i)[1]), doubletofloat(history.get(i + 1)[0]), doubletofloat(history.get(i + 1)[1])); 
     }
   }
+}
+
+float doubletofloat(double d) {
+  return (float) d;
 }
