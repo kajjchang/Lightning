@@ -1,13 +1,11 @@
 Light[] lights;
-boolean lastPressed;
 
 void setup() {
   size(500, 500);
   lights = new Light[25];
-  for (int i = 0; i < 25; i++) {
+  for (int i = 0; i < lights.length; i++) {
     lights[i] = new Light();
   }
-  lastPressed = false;
 }
 
 void draw() {
@@ -15,11 +13,6 @@ void draw() {
   for (Light light : lights) {
     light.update();
   }
-  lastPressed = mousePressed;
-}
-
-double[] equation(double x, double y, double t) {
-  return new double[] {-Math.pow(y, 2) - Math.pow(t, 2) + t * x, y * t + x * y};
 }
 
 class Light {
@@ -44,19 +37,17 @@ class Light {
     center_x = (target_x + this.x) / 2;
     center_y = (target_y + this.y) / 2;
     radius = dist((float) center_x, (float) center_y, (float) this.x, (float) this.y);
-    angle = Math.atan2(center_x - this.x, center_y - this.y);
+    angle = Math.atan((center_y - this.y) / (center_x - this.x));
+    if ((int) (Math.cos(angle) * radius + center_x) == (int) target_x && (int) (Math.sin(angle) * radius + center_y) == (int) target_y) {
+      angle += PI;
+    }
   }
   public void update() {
     x = Math.cos(angle) * radius + center_x;
     y = Math.sin(angle) * radius + center_y;
     angle += PI / 60;
-    if (dist((float) x, (float) y, (float) target_x, (float) target_y) < 10) {
-      // setTarget(Math.random() * width, Math.random() * height);
-    }
-    if (mousePressed && !lastPressed) {
-      // setTarget(Math.random() * width, Math.random() * height);
-    } else if (lastPressed && !mousePressed) {
-      // setTarget(Math.random() * width, Math.random() * height);
+    if (dist((float) target_x, (float) target_y, (float) x, (float) y) <= 10) {
+      setTarget(Math.random() * width, Math.random() * height);
     }
     if (history.size() == 100) {
       history.remove(0);
@@ -64,23 +55,13 @@ class Light {
     history.add(new Double[] {x, y});
     noStroke();
     fill(r, g, b);
+    // ellipse((float) center_x, (float) center_y, 15, 15);
+    // ellipse((float) target_x, (float) target_y, 15, 15);
     ellipse((float) x, (float) y, 15, 15);
-    for (int i = 0; i < history.size() - 4; i += 3) {
+    for (int i = 0; i < history.size() - 1; i ++) {
       stroke(r, g, b, 255 * i / history.size());
-      strokeWeight(5 * i / history.size());      
-      Double[] historical_coords_1 = history.get(i);
-      double historical_x_1 = historical_coords_1[0];
-      double historical_y_1 = historical_coords_1[1];
-      Double[] historical_coords_2 = history.get(i + 1);
-      double historical_x_2 = historical_coords_2[0];
-      double historical_y_2 = historical_coords_2[1];
-      Double[] historical_coords_3 = history.get(i + 2);
-      double historical_x_3 = historical_coords_3[0];
-      double historical_y_3 = historical_coords_3[1];
-      Double[] historical_coords_4 = history.get(i + 3);
-      double historical_x_4 = historical_coords_4[0];
-      double historical_y_4 = historical_coords_4[1];
-      bezier((float) historical_x_1, (float) historical_y_1, (float) historical_x_2, (float) historical_y_2, (float) historical_x_3, (float) historical_y_3, (float) historical_x_4, (float) historical_y_4);
+      strokeWeight(5 * i / history.size());   
+      line((float)(double) history.get(i)[0], (float)(double) history.get(i)[1], (float)(double) history.get(i + 1)[0], (float)(double) history.get(i + 1)[1]); 
     }
   }
 }
